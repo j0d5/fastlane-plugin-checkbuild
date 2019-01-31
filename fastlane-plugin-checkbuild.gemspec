@@ -8,10 +8,10 @@ Gem::Specification.new do |spec|
   spec.name          = 'fastlane-plugin-checkbuild'
   spec.version       = Fastlane::Checkbuild::VERSION
   spec.author        = 'Johannes Steudle'
-  spec.email         = 'johannes.steudle@bosch-softtec.com'
+  spec.email         = 'tweetjay2@icloud.com'
 
   spec.summary       = 'This plugin will check any binary library for unwanted symbols and architectures'
-  # spec.homepage      = "https://github.com/<GITHUB_USERNAME>/fastlane-plugin-checkbuild"
+  spec.homepage      = "https://github.com/tweetjay/fastlane-plugin-checkbuild"
   spec.license       = "MIT"
 
   spec.files         = Dir["lib/**/*"] + %w(README.md LICENSE)
