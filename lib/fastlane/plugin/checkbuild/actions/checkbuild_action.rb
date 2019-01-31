@@ -179,29 +179,29 @@ module Fastlane
 
       def self.available_options
         [
-          # FastlaneCore::ConfigItem.new(key: :your_option,
-          #                         env_name: "CHECKBUILD_YOUR_OPTION",
-          #                      description: "A description of your option",
-          #                         optional: false,
-          #                             type: String)
           FastlaneCore::ConfigItem.new(key: :file_path,
            env_name: 'FILE_PATH',
-           description: 'Path to the file that should be checked',
+           description: 'Path to the file that should be checked. This must point to a binary file, either a library or an app\'s binary,'
            optional: false,
            type: String),
-          FastlaneCore::ConfigItem.new(key: :req_archs,
+           FastlaneCore::ConfigItem.new(key: :req_archs,
            env_name: 'REQ_ARCHS',
-           description: 'The architectures that are required',
+           description: 'The architectures that are required, e.g. i386, x86_64, armv7, arm64',
            optional: false,
            type: String)
+         ]
+       end
+
+       def self.example_code
+        [
+          'checkbuild(
+           file_path: '../build/DerivedData/Build/Products/Debug-iphoneos/<AppName>.app/<AppName>',
+           req_archs: 'i386, x86_64, armv7, arm64'
+           )'
         ]
       end
 
       def self.is_supported?(platform)
-        # Adjust this if your plugin only works for a particular platform (iOS vs. Android, for example)
-        # See: https://docs.fastlane.tools/advanced/#control-configuration-by-lane-and-by-platform
-        #
-        # [:ios, :mac, :android].include?(platform)
         true
       end
     end
