@@ -1,3 +1,6 @@
 lane :test do
-  checkbuild
+    checkbuild(
+      file_path: '../build/DerivedData/Build/Products/Debug-iphoneos/<AppName>.app/<AppName>',
+      req_archs: 'i386, x86_64, armv7, arm64'
+    )
 end
