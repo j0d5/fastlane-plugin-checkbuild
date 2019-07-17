@@ -96,80 +96,80 @@ module Fastlane
 
         contains_filesize = false
         if result.include? "filesize"
+          # TODO
+          contains_filesize = true
+        end
+
+        if contains_llvm && contains_filesize then
+          UI.message("Bitcode active!")
+        else
+          UI.message("Bitcode inactive!")
+        end
+      else
+        UI.error("Command otool not found!")
+      end
+    end
+
+    def check_for_assertion
+      UI.verbose("Check for assertions...")
+      nm = %x( command -v nm ).strip
+      if nm != "" then
+        command = nm + " " + @file_path
+        result = `#{command}`
+
+        if result.include? "NSAssertionHandler" then
+          UI.error("File contains assertions!")
+        else
+          UI.success("File does not contain any assertions!")
+        end
+      else
+        UI.error("Command nm not found!")
+      end
+    end
+
+    def check_debug_symbols
+      UI.verbose("Check for debug symbols")
+      nm = %x( command -v nm ).strip
+      if nm != "" then
+        command1 = nm + " " + @file_path
+        command2 = nm + " -a " + @file_path
+        slimDump = `#{command1}`
+        fatDump = `#{command2}`
         # TODO
-        contains_filesize = true
+      end
+    end
+
+    def check_for_flagged_tests
+      UI.verbose("Check for flagged tests")
+
+    end
+
+  end
+
+  module Actions
+    class CheckbuildAction < Action
+      def self.run(params)
+        file_path = File.expand_path(params[:file_path])
+        required_archs = params[:req_archs].gsub(/[[:space:]]/, '').split(pattern=',')
+        checker = BinaryChecker.new(file_path)
+        checker.check_architectures(required_archs)
+        checker.check_for_assertion
+        checker.check_debug_symbols
+        checker.check_profiling_data
+        checker.check_encryption
+        checker.check_coverage_symbols
+        checker.check_bitcode_availability
       end
 
-      if contains_llvm && contains_filesize then
-        UI.message("Bitcode active!")
-      else
-        UI.message("Bitcode inactive!")
+      def self.description
+        "This plugin will check any binary library for unwanted symbols and architectures."
       end
-    else
-      UI.error("Command otool not found!")
-    end
-  end
 
-  def check_for_assertion
-    UI.verbose("Check for assertions...")
-    nm = %x( command -v nm ).strip
-    if nm != "" then
-      command = nm + " " + @file_path
-      result = `#{command}`
-
-      if result.include? "NSAssertionHandler" then
-        UI.error("File contains assertions!")
-      else
-        UI.success("File does not contain any assertions!")
+      def self.authors
+        ["Johannes Steudle"]
       end
-    else
-      UI.error("Command nm not found!")
-    end
-  end
 
-  def check_debug_symbols
-    UI.verbose("Check for debug symbols")
-    nm = %x( command -v nm ).strip
-    if nm != "" then
-      command1 = nm + " " + @file_path
-      command2 = nm + " -a " + @file_path
-      slimDump = `#{command1}`
-      fatDump = `#{command2}`
-      # TODO
-    end
-  end
-
-  def check_for_flagged_tests
-    UI.verbose("Check for flagged tests")
-
-  end
-
-end
-
-module Actions
-  class CheckbuildAction < Action
-    def self.run(params)
-      file_path = File.expand_path(params[:file_path])
-      required_archs = params[:req_archs].gsub(/[[:space:]]/, '').split(pattern=',')
-      checker = BinaryChecker.new(file_path)
-      checker.check_architectures(required_archs)
-      checker.check_for_assertion
-      checker.check_debug_symbols
-      checker.check_profiling_data
-      checker.check_encryption
-      checker.check_coverage_symbols
-      checker.check_bitcode_availability
-    end
-
-    def self.description
-      "This plugin will check any binary library for unwanted symbols and architectures."
-    end
-
-    def self.authors
-      ["Johannes Steudle"]
-    end
-
-    def self.return_value
+      def self.return_value
         # If your method provides a return value, you can describe here what it does
       end
 
@@ -193,15 +193,15 @@ module Actions
       def self.available_options
         [
           FastlaneCore::ConfigItem.new(key: :file_path,
-           env_name: 'FILE_PATH',
-           description: 'Path to the file that should be checked. This must point to a binary file, either a library or an app\'s binary',
-           optional: false,
-           type: String),
-          FastlaneCore::ConfigItem.new(key: :req_archs,
-           env_name: 'REQ_ARCHS',
-           description: 'The architectures that are required, e.g. i386, x86_64, armv7, arm64',
-           optional: false,
-           type: String)
+                                       env_name: 'FILE_PATH',
+                                       description: 'Path to the file that should be checked. This must point to a binary file, either a library or an app\'s binary',
+                                       optional: false,
+                                       type: String),
+                                       FastlaneCore::ConfigItem.new(key: :req_archs,
+                                                                    env_name: 'REQ_ARCHS',
+                                                                    description: 'The architectures that are required, e.g. i386, x86_64, armv7, arm64',
+                                                                    optional: false,
+                                                                    type: String)
         ]
       end
 
